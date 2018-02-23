@@ -41,6 +41,27 @@ public class Engine {
 
 
 	private void processTransactionFromFpga() {
+		/*
+		 *  while (frame.type != last frame) {
+		 *  	calculateCrc(); // of current frame
+		 *  	if (crcOK) {
+					send this frame to jawny
+					send confirmation to fpga
+					listenToFrame();
+				} else {
+					send error
+					requestRetransmission();
+					listenToFrame();
+				}
+				
+		 *  }
+		 */
+		
+	}
+
+
+
+	private void calculateCrc() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -48,8 +69,7 @@ public class Engine {
 
 
 	private void listenToStartFrame() {
-		
-		// TODO Auto-generated method stub
+		// create frame and set mode flags
 		
 	}
 
@@ -58,6 +78,11 @@ public class Engine {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	private void log(String s) {
+		System.out.println("Engine: " + s);
+	
 	}
 
 }
