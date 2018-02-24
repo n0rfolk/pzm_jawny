@@ -1,5 +1,8 @@
 package master;
 
+import java.util.Enumeration;
+
+import gnu.io.CommPortIdentifier;
 import utilities.Frame;
 
 public class Engine {
@@ -10,6 +13,10 @@ public class Engine {
 	public Engine() {
 		this.fpgaToJawny = false;
 		this.jawnyToFpga = false;
+		
+		// for debugging purposes
+		printAvailableComPorts();
+		
 	}
 	
 	
@@ -36,6 +43,21 @@ public class Engine {
 	private void processTransactionFromJawny() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void printAvailableComPorts() {
+	        Enumeration<?> portList;
+	        CommPortIdentifier serialPortId;
+	
+	        portList = CommPortIdentifier.getPortIdentifiers();
+	        log("Available ports: ");
+			while (portList.hasMoreElements()) {
+				serialPortId = (CommPortIdentifier) portList.nextElement();
+				if(serialPortId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+					log(serialPortId.getName());
+				}
+			}
+			
 	}
 
 
@@ -76,7 +98,8 @@ public class Engine {
 
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		Engine e = new Engine();
+	
 
 	}
 	
