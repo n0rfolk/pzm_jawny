@@ -12,24 +12,23 @@ public class SerialComm {
 	public SerialComm() {
 		try {
 			connect("COM6");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 
 	void connect (String portName) throws Exception {
+		log("Setting up..");
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if (portIdentifier.isCurrentlyOwned()) {
-            LogWriter.log("Error: Port is currently in use");
+            log("Port opening: X - Port is currently in use");
         }
         else {
             CommPort commPort = portIdentifier.open(this.getClass().getName(),2000);
             
-            if ( commPort instanceof SerialPort ) {
+            if (commPort instanceof SerialPort) {
                 SerialPort serialPort = (SerialPort) commPort;
-                serialPort.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-                LogWriter.log("Port opening succeded!");
+                serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE); 
+                log("Port opening: OK");
+                
                 //InputStream in = serialPort.getInputStream();
                 //OutputStream out = serialPort.getOutputStream();
                 
@@ -38,8 +37,13 @@ public class SerialComm {
 
             }
             else {
-            	 LogWriter.log("Error: Only serial ports are handled by this example.");
+            	 log("Port opening: X - Only serial ports can be used");
             }
-        }     
+        }
+        log("Setting up succeeded!");
     }
+	
+	private void log(String s) {
+		LogWriter.log("SerialComm", s);
+	}
 }

@@ -3,11 +3,11 @@ package serial;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class SerialWriter implements Runnable 
+public class FpgaWriter implements Runnable 
 {
     OutputStream out;
     
-    public SerialWriter (OutputStream out)
+    public FpgaWriter (OutputStream out)
     {
         this.out = out;
     }

@@ -3,6 +3,9 @@ package serial;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * This class handles frame exchange with fpga device
+ */
 public class FpgaReader implements Runnable {
     InputStream in;
     
@@ -11,7 +14,7 @@ public class FpgaReader implements Runnable {
     }
     
     /**
-     * Function that reads single frame from fpga
+     * Method that reads single frame from input stream
      */
     public void run () {
     	// TODO: implement behavior
