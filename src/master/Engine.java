@@ -1,22 +1,19 @@
 package master;
 
-import java.util.Enumeration;
-
-import gnu.io.CommPortIdentifier;
-import utilities.Frame;
+import utilities.SerialComm;
 
 public class Engine {
 	boolean fpgaToJawny;
 	boolean jawnyToFpga;
 	
+	// serial communication
+	SerialComm sc;
+	
+	
 	
 	public Engine() {
 		this.fpgaToJawny = false;
 		this.jawnyToFpga = false;
-		
-		// for debugging purposes
-		printAvailableComPorts();
-		
 	}
 	
 	
@@ -45,21 +42,6 @@ public class Engine {
 		
 	}
 	
-	private void printAvailableComPorts() {
-	        Enumeration<?> portList;
-	        CommPortIdentifier serialPortId;
-	
-	        portList = CommPortIdentifier.getPortIdentifiers();
-	        log("Available ports: ");
-			while (portList.hasMoreElements()) {
-				serialPortId = (CommPortIdentifier) portList.nextElement();
-				if(serialPortId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-					log(serialPortId.getName());
-				}
-			}
-			
-	}
-
 
 
 	private void processTransactionFromFpga() {
@@ -99,13 +81,6 @@ public class Engine {
 
 	public static void main(String[] args) {
 		Engine e = new Engine();
-	
-
 	}
 	
-	private void log(String s) {
-		System.out.println("Engine: " + s);
-	
-	}
-
 }
