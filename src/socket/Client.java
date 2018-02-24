@@ -11,14 +11,22 @@ import utilities.Frame;
 import utilities.LogWriter;
 
 public class Client {
+	//Client attributes
 	Socket socket;
-	InputStream in;
+	//InputStream in;
 	OutputStream out;
 	
 	// default Client constructor
 	public Client() throws UnknownHostException, IOException {
 		this.socket = new Socket("172.23.180.64", 9999);
-		this.in = socket.getInputStream();
+		//this.in = socket.getInputStream();
+		this.out = socket.getOutputStream();
+	}
+	
+	//Client constructor with given IP address
+	public Client(String ipAddress) throws UnknownHostException, IOException {
+		this.socket = new Socket(ipAddress, 9999);
+		//this.in = socket.getInputStream();
 		this.out = socket.getOutputStream();
 	}
 	
