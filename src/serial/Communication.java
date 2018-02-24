@@ -2,6 +2,8 @@ package serial;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
@@ -12,7 +14,12 @@ public class Communication {
 	private InputStream in; 
     private OutputStream out; 
     
+    ArrayList<Entry<Integer, String>> ipTable;
+    
 	public Communication(String portName) throws Exception {
+		
+		
+		
 		log("Setting up..");
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if (portIdentifier.isCurrentlyOwned()) {

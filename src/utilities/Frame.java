@@ -108,7 +108,7 @@ public class Frame {
 		return result;
 	}
 	
-	//escape
+	// escape
 	public static byte[] escapeBytes(byte[] bytes) {
 		List<Byte> bytesList = new ArrayList<Byte>();
 		for (int i = 0; i < bytes.length; i++) {
@@ -120,20 +120,20 @@ public class Frame {
 				bytesList.add(bytes[i]);
 			}
 		}
-		byte[] trueBytes = new byte[bytesList.size()];
 		
+		byte[] trueBytes = new byte[bytesList.size()];
 		for (int i = 0; i < bytesList.size(); i++) {
 			trueBytes[i] = bytesList.get(i);
 		}
 		return trueBytes;
 	}
 	
-	//deescape
+	// de-escape
 	public static byte[] deescapeBytes(byte[] bytes) {
 		List<Byte> bytesList = new ArrayList<Byte>();
 		boolean escaped = false;
 		for (int i = 0; i < bytes.length; i++) {
-			if (escaped == false && (bytes[i] == (byte) START || bytes[i] == (byte) STOP || bytes[i] == (byte) ESCAPE)) {
+			if (escaped == false && (bytes[i] == (byte) START || bytes[i] == (byte) STOP || bytes[i] == (byte) ESCAPE)) { 
 				bytes[i + 1] ^= XORVALUE;
 				escaped = true;
 			}
@@ -142,8 +142,8 @@ public class Frame {
 				escaped = false;
 			}
 		}
-		byte[] trueBytes = new byte[bytesList.size()];
 		
+		byte[] trueBytes = new byte[bytesList.size()];
 		for (int i = 0; i < bytesList.size(); i++) {
 			trueBytes[i] = bytesList.get(i);
 		}

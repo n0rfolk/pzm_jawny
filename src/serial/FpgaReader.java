@@ -3,6 +3,8 @@ package serial;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import socket.Client;
 import utilities.Frame;
@@ -12,19 +14,26 @@ import utilities.LogWriter;
  * This class handles frames comming from fpga
  */
 public class FpgaReader implements Runnable  {
+	
+    private Frame currentlyProcessedFrame; // temporary frame variable
+    private int retransmissionRequestCounter;
+	
+	// serial comm streams
     InputStream in;
     OutputStream out;
     
-    Frame currentlyProcessedFrame;
-    
+    // socket comm minsc
     Client c;
+    ArrayList<String> ipTable; // maps ids to ip adresses
     
     
+    // constructor
     public FpgaReader (InputStream in, OutputStream out) {
         this.in = in;
         this.out = out;
-        this.currentlyProcessedFrame = new Frame();
-        this.c = new Client("192.168.0.112");
+        this.retransmissionRequestCounter = 0;
+        this.currentlyProcessedFrame = null;
+        //this.ipTable = FileLoader.getIpTable(); // load ipTables from file
     }
     
     /**
@@ -34,9 +43,9 @@ public class FpgaReader implements Runnable  {
      * 1. reads frame from input stream
      * 2. creates Frame object from read frame
      * 3. calculate CRC
-     *    3.1 crc OK -> 
+     *    3.1 CRC: OK  -> send to remote via Sockets and send confirmation to fpga
+     *    3.2 CRC: ERR -> request retransmission from fpga
      *    
-     *    3.2 crc ERR ->	
      * 		
      */
     public void processFrame() {
@@ -59,7 +68,6 @@ public class FpgaReader implements Runnable  {
 			}
 			buffer[i] = currentByte;
 			
-			
 			// 2 - create new Frame object 
 			currentlyProcessedFrame = new Frame(Frame.deescapeBytes(buffer));
 			Frame.printBytes(currentlyProcessedFrame.getBytesWithCRC());
@@ -67,14 +75,34 @@ public class FpgaReader implements Runnable  {
 			// 3 - calculate crc
 			if (currentlyProcessedFrame.getcrc32() == currentlyProcessedFrame.calcCrc32()) {
 				// 3.1
+				// CRC: OK
+				if (currentlyProcessedFrame.getNr() == 0) {
+					c = new Client(ipTable.get(currentlyProcessedFrame.getIdO())); // beginning of new file, create Client with proper ip address
+				}
 				c.sendFrame(currentlyProcessedFrame);
+				
+				// announce frame OK
+				out.write((byte) 0x05); 
 			} else {
-				//TODO: retransmission
+				// 3.2
+				// CRC: ERR
+				// retransmission needed
+				retransmissionRequestCounter++;
+				if (retransmissionRequestCounter < 50) {
+					// announce error
+					out.write((byte) 0x04);
+				} else {
+					// announce fatal error
+					out.write((byte) 0x08);
+					retransmissionRequestCounter = 0;
+				}
 			}
 			
 		} catch (IOException e) { e.printStackTrace(); }
     	
-    	currentlyProcessedFrame = new Frame();
+    	// clean up temporary variables
+    	retransmissionRequestCounter = 0;
+    	currentlyProcessedFrame = null;
     }
 
     
@@ -86,7 +114,6 @@ public class FpgaReader implements Runnable  {
 	public void run() {
 		while (true) {
 			processFrame();
-		}
-		
+		}	
 	}
 }
