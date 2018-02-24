@@ -2,6 +2,11 @@ package master;
 
 import serial.SerialComm;
 
+/**
+ * 
+ * This class is control center of application flow.
+ *
+ */
 public class Engine {
 	boolean fpgaToJawny;
 	boolean jawnyToFpga;
