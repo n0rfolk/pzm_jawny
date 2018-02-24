@@ -46,7 +46,7 @@ public class FpgaReader {
 			buffer[i] = currentByte;
 			
 			currentFrame = new Frame(buffer);
-			Frame.printBytes(currentFrame.getBytesWithCRC());
+			Frame.printBytes(buffer);
 			System.out.println("");
 		} catch (IOException e) { e.printStackTrace(); }
     	
