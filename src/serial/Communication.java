@@ -11,11 +11,10 @@ import gnu.io.SerialPort;
 import utilities.LogWriter;
 
 public class Communication {
+	// serial comm streams
 	private InputStream in; 
     private OutputStream out; 
-    
-    ArrayList<Entry<Integer, String>> ipTable;
-    
+
 	public Communication(String portName) throws Exception {
 		
 		

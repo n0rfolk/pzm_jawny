@@ -54,8 +54,7 @@ public class Frame {
 			dataBytes[i] = bytes[7 + i];
 		}
 		this.data = dataBytes;
-		int calculatedCRC32 = this.calcCrc32();
-		this.crc32 = calculatedCRC32;			
+		this.crc32 = bytesToInt(new byte[] {bytes[SIZE-4], bytes[SIZE-3], bytes[SIZE-2], bytes[SIZE-1]});			
 	}
 	
 	//Returns byte[] of Frame without CRC
