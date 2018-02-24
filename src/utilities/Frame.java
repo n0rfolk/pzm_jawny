@@ -3,7 +3,9 @@ package utilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -17,11 +19,19 @@ public class Frame {
 	int nr;
 	byte[] data;
 	int crc32;
+	
+	//trash
+	private final static byte START = 0x06;
+	private final static byte STOP = 0x07;
+	private final static byte ESCAPE = 0x14;
+	private final static byte XORVALUE = 0x20;
+	
 	//Frame constructor filling data with 1
 	public Frame() {
 		this.data = new byte[dataSize];
 		Arrays.fill(this.data, (byte) 1);
 	}
+	
 	//Frame default constructor
 	public Frame(byte type, byte idO, byte idN, int nr, byte[] ip, byte[] data, int crc32) {
 		this.type = type;
@@ -31,6 +41,7 @@ public class Frame {
 		this.data = data;
 		this.crc32 = crc32;
 	}
+	
 	//Frame unpacking from byte[]
 	public Frame(byte[] bytes) {
 		this.type = bytes[0];
@@ -46,6 +57,7 @@ public class Frame {
 		int calculatedCRC32 = this.calcCrc32();
 		this.crc32 = calculatedCRC32;			
 	}
+	
 	//Returns byte[] of Frame without CRC
 	public byte[] getBytes() {
 		byte[] typeTab = new byte[1]; 
@@ -57,6 +69,7 @@ public class Frame {
 		byte[] bytes = bytesConcatenation(typeTab, IdOTab, IdNTab, this.intToBytes(this.getNr()), this.getData());
 		return bytes;
 	}
+	
 	//Returns calculated crc of a Frame
 	public int calcCrc32() {
 		Checksum checksum = new CRC32();
@@ -64,6 +77,7 @@ public class Frame {
 		checksum.update(bytes, 0, bytes.length);
 		return (int) checksum.getValue();
 	}
+	
 	//returns concatenated bytes from Frame. Frame constructing without crc, used in getBytes()
 	public byte[] bytesConcatenation(byte[] type, byte[] idO, byte[] idN, byte[] nr, byte[] data) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
@@ -80,6 +94,7 @@ public class Frame {
 		byte result[] = outputStream.toByteArray( );
 		return result;
 	}
+	
 	//returns byte[] of frame with crc of this frame
 	public byte[] getBytesWithCRC() {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
@@ -92,33 +107,81 @@ public class Frame {
 		byte result[] = outputStream.toByteArray( );
 		return result;
 	}
+	
+	//escape
+	public static byte[] escapeBytes(byte[] bytes) {
+		List<Byte> bytesList = new ArrayList<Byte>();
+		for (int i = 0; i < bytes.length; i++) {
+			if (bytes[i] == (byte) START || bytes[i] == (byte) STOP || bytes[i] == (byte) ESCAPE) {
+				bytesList.add((byte) ESCAPE);
+				bytesList.add((byte) (bytes[i] ^ (byte) XORVALUE));
+			}
+			else {
+				bytesList.add(bytes[i]);
+			}
+		}
+		byte[] trueBytes = new byte[bytesList.size()];
+		
+		for (int i = 0; i < bytesList.size(); i++) {
+			trueBytes[i] = bytesList.get(i);
+		}
+		return trueBytes;
+	}
+	
+	//deescape
+	public static byte[] deescapeBytes(byte[] bytes) {
+		List<Byte> bytesList = new ArrayList<Byte>();
+		boolean escaped = false;
+		for (int i = 0; i < bytes.length; i++) {
+			if (escaped == false && (bytes[i] == (byte) START || bytes[i] == (byte) STOP || bytes[i] == (byte) ESCAPE)) {
+				bytes[i + 1] ^= XORVALUE;
+				escaped = true;
+			}
+			else {
+				bytesList.add(bytes[i]);
+				escaped = false;
+			}
+		}
+		byte[] trueBytes = new byte[bytesList.size()];
+		
+		for (int i = 0; i < bytesList.size(); i++) {
+			trueBytes[i] = bytesList.get(i);
+		}
+		return trueBytes;
+	}
+	
 	//prints byte[]
 	public static void printBytes(byte[] bytes) {
 		for (int i = 0; i < bytes.length; i++) {
 			System.out.print(String.format("%02X",  bytes[i]));
 		}
 	}
+	
 	//returns conversion from short to byte[]
 	public byte[] shortToBytes(short value) {
 		ByteBuffer buffer = ByteBuffer.allocate(2);
 		buffer.putShort(value);
 		return buffer.array();
 	}
+	
 	//returns conversion from int to byte[]
 	public byte[] intToBytes(int value) {
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putInt(value);
 		return buffer.array();
 	}
+	
 	//returns conversion from byte[] to short
 	public short bytesToShort(byte[] bytes) {
 		short s = (short) (bytes[0]<<8 | bytes[1] & 0xFF);
 		return s;
 	}
+	
 	//returns conversion from byte[] to int
 	int bytesToInt(byte[] bytes) {
 	     return ByteBuffer.wrap(bytes).getInt();
 	}
+	
 	//getters and setters section
 	public byte getType() {
 		return type;
@@ -166,7 +229,5 @@ public class Frame {
 
 	public void setNr(int nr) {
 		this.nr = nr;
-	}
-
-	
+	}	
 }
