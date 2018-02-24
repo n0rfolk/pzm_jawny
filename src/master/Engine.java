@@ -2,7 +2,8 @@ package master;
 
 import serial.FpgaReader;
 import serial.FpgaWriter;
-import serial.SerialComm;
+import serial.Communication;
+import utilities.Frame;
 import utilities.LogWriter;
 
 /**
@@ -15,7 +16,7 @@ public class Engine {
 	boolean jawnyToFpga;
 	
 	// serial communication module
-	private SerialComm sc;
+	private Communication sc;
 	private FpgaReader fr;
 	private FpgaWriter fw;
 	
@@ -28,9 +29,7 @@ public class Engine {
 		
 		// initialize serial communication
 		try {
-			this.sc = new SerialComm("COM6");
-			fr = new FpgaReader(sc.getInputStream(), sc.getOutputStream());
-			fw = new FpgaWriter(sc.getInputStream(), sc.getOutputStream());
+			this.sc = new Communication("COM6");
 		} catch (Exception e) { e.printStackTrace(); }
 	}
 	
@@ -91,8 +90,11 @@ public class Engine {
 
 
 	private void listenToStartFrame() {
-		log("Waiting for first frame..");
-		fr.readFrame();
+		//log("Waiting for first frame..");
+		//fr.readFrame();
+		//fpgaToJawny = true;
+		
+		
 		
 	}
 

@@ -8,11 +8,11 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import utilities.LogWriter;
 
-public class SerialComm {
+public class Communication {
 	private InputStream in; 
     private OutputStream out; 
     
-	public SerialComm(String portName) throws Exception {
+	public Communication(String portName) throws Exception {
 		log("Setting up..");
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if (portIdentifier.isCurrentlyOwned()) {
@@ -28,11 +28,17 @@ public class SerialComm {
                 
                 this.in = serialPort.getInputStream();
                 this.out = serialPort.getOutputStream();
+                
+                (new Thread(new FpgaReader(in, out))).start();
+               // (new Thread(new SerialWriter(out))).start();
+                
+                log("Setting up succeeded!");
+                log("FpgaReader is running..");
             }
             else {
             	 log("Port opening: ERR - Only serial ports can be used");
             }
-            log("Setting up succeeded!");
+           
         }
         
 	}

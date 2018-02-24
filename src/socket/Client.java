@@ -13,17 +13,22 @@ public class Client {
 	OutputStream out;
 	
 	// default Client constructor
-	public Client() throws UnknownHostException, IOException {
+	public Client() {
 		String defautIP = "172.23.180.64";
-		this.socket = new Socket(defautIP, 9999);
-		this.out = socket.getOutputStream();
+		try {
+			this.socket = new Socket(defautIP, 9999);
+			this.out = socket.getOutputStream();
+		} catch (IOException e) { e.printStackTrace(); }
 		log("created new client instance with default ip " + defautIP);
 	}
 	
 	//Client constructor with given IP address
-	public Client(String ipAddress) throws UnknownHostException, IOException {
-		this.socket = new Socket(ipAddress, 9999);
-		this.out = socket.getOutputStream();
+	public Client(String ipAddress) {
+		try {
+			this.socket = new Socket(ipAddress, 9999);
+			this.out = socket.getOutputStream();
+		} catch (IOException e) { e.printStackTrace(); }
+		
 		log("created new client instance with ip " + ipAddress);
 	}
 	
@@ -37,7 +42,7 @@ public class Client {
 	public void sendFrame(Frame f) throws IOException {
 		this.out.write(f.getBytesWithCRC());
 		log("frame sent");
-		closeSession();
+		//closeSession();
 	}
 	
 	//prints logs

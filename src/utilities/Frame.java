@@ -153,7 +153,7 @@ public class Frame {
 	//prints byte[]
 	public static void printBytes(byte[] bytes) {
 		for (int i = 0; i < bytes.length; i++) {
-			System.out.print(String.format("%02X",  bytes[i]));
+			System.out.print(String.format("%02X ",  bytes[i]));
 		}
 		System.out.println("");
 	}
