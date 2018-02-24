@@ -155,6 +155,7 @@ public class Frame {
 		for (int i = 0; i < bytes.length; i++) {
 			System.out.print(String.format("%02X",  bytes[i]));
 		}
+		System.out.println("");
 	}
 	
 	//returns conversion from short to byte[]
