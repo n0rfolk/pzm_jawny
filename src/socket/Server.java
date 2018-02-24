@@ -17,24 +17,34 @@ public class Server {
 	// TODO: FpgaWriter
 
 	// default Server constructor
-	public Server() throws UnknownHostException, IOException {
-		this.serverSocket = new ServerSocket(9999);
-		this.socket = serverSocket.accept();
-		this.in = socket.getInputStream();
-		log("created new instance");
+	public Server() {
+		try {
+			this.serverSocket = new ServerSocket(9999);
+			log("created new instance");
+			this.socket = serverSocket.accept();
+			log("connection established");
+			this.in = socket.getInputStream();	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//Server start
-	void run() throws IOException {
+	void run(){
 		readFrame();
 		// TODO: FpgaWriter
-		closeSession();
+		//closeSession();	
 	}
 	
 	//Read frame
-	private void readFrame() throws IOException {
+	private void readFrame() {
 		byte[] buffer = new byte[Frame.SIZE];
-		this.in.read(buffer);
+		try {
+			this.in.read(buffer);
+			Frame.printBytes(buffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		log("frame read");
 	}
 	
@@ -47,5 +57,12 @@ public class Server {
 	//prints logs
 	private void log(String s) {
 		LogWriter.log(this.getClass().getName(), s);
+	}
+	
+	public static void main(String[] args) {
+		Server server = new Server();
+		while(true) {
+			server.run();
+		}
 	}
 }
