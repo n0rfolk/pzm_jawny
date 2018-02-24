@@ -1,35 +1,45 @@
-package utilities;
+package serial;
 
-import java.util.Enumeration;
-
+import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import utilities.LogWriter;
+
+//(new TwoWaySerialComm()).connect("COM3");
 
 public class SerialComm {
-	private Enumeration<?> portList;
-	private CommPortIdentifier commPortIdentifier;
-	
 	
 	public SerialComm() {
-		
-	}
-	
-	/**
-	 * Functions scans for available serial communication ports
-	 * and stores them in portList variable.
-	 */
-	private void scanAvailableCommPorts() {
-		CommPortIdentifier tmp;
-        portList = CommPortIdentifier.getPortIdentifiers();
-        LogWriter.log("Printing available ports..");
-		while (portList.hasMoreElements()) {
-			tmp = (CommPortIdentifier) portList.nextElement();
-			if(tmp.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-				LogWriter.log(tmp.getName());
-			}
+		try {
+			connect("COM6");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-	
-	private void openCommPort() {
-		
-	}
+
+	void connect (String portName) throws Exception {
+        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+        if (portIdentifier.isCurrentlyOwned()) {
+            LogWriter.log("Error: Port is currently in use");
+        }
+        else {
+            CommPort commPort = portIdentifier.open(this.getClass().getName(),2000);
+            
+            if ( commPort instanceof SerialPort ) {
+                SerialPort serialPort = (SerialPort) commPort;
+                serialPort.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+                LogWriter.log("Port opening succeded!");
+                //InputStream in = serialPort.getInputStream();
+                //OutputStream out = serialPort.getOutputStream();
+                
+                //(new Thread(new SerialReader(in))).start();
+                //(new Thread(new SerialWriter(out))).start();
+
+            }
+            else {
+            	 LogWriter.log("Error: Only serial ports are handled by this example.");
+            }
+        }     
+    }
 }
