@@ -1,6 +1,7 @@
 package master;
 
 import serial.SerialComm;
+import utilities.LogWriter;
 
 /**
  * 
@@ -87,6 +88,10 @@ public class Engine {
 
 	public static void main(String[] args) {
 		Engine e = new Engine();
+	}
+	
+	private void log(String s) {
+		LogWriter.log(this.getClass().getName(), s);
 	}
 	
 }

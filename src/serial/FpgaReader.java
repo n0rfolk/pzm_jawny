@@ -3,6 +3,8 @@ package serial;
 import java.io.IOException;
 import java.io.InputStream;
 
+import utilities.LogWriter;
+
 /**
  * This class handles frame exchange with fpga device
  */
@@ -26,4 +28,8 @@ public class FpgaReader implements Runnable {
 //            }
 //        } catch (IOException e) { e.printStackTrace(); }            
     }
+    
+    private void log(String s) {
+		LogWriter.log(this.getClass().getName(), s);
+	}
 }

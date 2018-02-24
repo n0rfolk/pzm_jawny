@@ -3,6 +3,8 @@ package serial;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import utilities.LogWriter;
+
 public class FpgaWriter implements Runnable 
 {
     OutputStream out;
@@ -27,4 +29,8 @@ public class FpgaWriter implements Runnable
             e.printStackTrace();
         }            
     }
+    
+	private void log(String s) {
+		LogWriter.log(this.getClass().getName(), s);
+	}
 }

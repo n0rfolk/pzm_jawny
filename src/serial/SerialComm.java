@@ -5,8 +5,6 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import utilities.LogWriter;
 
-//(new TwoWaySerialComm()).connect("COM3");
-
 public class SerialComm {
 	
 	public SerialComm() {
@@ -44,6 +42,6 @@ public class SerialComm {
     }
 	
 	private void log(String s) {
-		LogWriter.log("SerialComm", s);
+		LogWriter.log(this.getClass().getName(), s);
 	}
 }
