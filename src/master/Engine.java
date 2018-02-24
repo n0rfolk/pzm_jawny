@@ -1,6 +1,6 @@
 package master;
 
-import utilities.SerialComm;
+import serial.SerialComm;
 
 public class Engine {
 	boolean fpgaToJawny;
@@ -14,6 +14,7 @@ public class Engine {
 	public Engine() {
 		this.fpgaToJawny = false;
 		this.jawnyToFpga = false;
+		this.sc = new SerialComm();
 	}
 	
 	
