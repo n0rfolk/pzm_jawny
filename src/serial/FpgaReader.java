@@ -35,6 +35,7 @@ public class FpgaReader implements Runnable  {
         this.retransmissionRequestCounter = 0;
         this.currentlyProcessedFrame = null;
         this.ipTable = FileLoader.getIpTable(); // load ipTables from file
+        log(".. is listening");
     }
     
     /**
@@ -50,7 +51,6 @@ public class FpgaReader implements Runnable  {
      * 		
      */
     public void processFrame() {
-    	
     	// 1 - receive whole frame from fpga device 
     	byte[] buffer = new byte[Frame.SIZE * 2];
     	
