@@ -33,6 +33,7 @@ public class FpgaWriter {
 			out.write(Frame.escapeBytes(f.getBytesWithCRC()));
 			out.write(Frame.STOP);
 			out.flush();
+			log("Frame " + f.getNr() + " sent");
 		} catch (IOException e) { e.printStackTrace(); }
     }
     
