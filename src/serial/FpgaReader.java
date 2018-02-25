@@ -69,31 +69,32 @@ public class FpgaReader implements Runnable  {
 					startFrameOccured = true;
 				}
 			}
-			// last byte we dont need.. 
-			//buffer[i] = currentByte;
+			// in this place buffer has whole frame without START (0x06) and without END (0x07)
 			
-			log("buffer without first and last byte");
-			Frame.printBytes(buffer);
+		
 			
 			// 2 - create new Frame object 
 			currentlyProcessedFrame = new Frame(Frame.deescapeBytes(buffer));
-			log("buffer after descape");
-			Frame.printBytes(Frame.deescapeBytes(buffer));
 			
 			log("Frame with CRC");
 			Frame.printBytes(currentlyProcessedFrame.getBytesWithCRC());
 			
 			// 3 - calculate crc
-			//log("getcrc32: " + String.format("0x%02X", currentlyProcessedFrame.getcrc32()));
-			//log("calcCrc32: " + String.format("0x%02X", currentlyProcessedFrame.calcCrc32()));
 			if (currentlyProcessedFrame.getcrc32() == currentlyProcessedFrame.calcCrc32()) {
 				// 3.1
 				// CRC: OK
-				log(""+currentlyProcessedFrame.getNr());
-				if (currentlyProcessedFrame.getNr() == 0) {
-					c = new Client(ipTable.get(currentlyProcessedFrame.getIdO())); // beginning of new file, create Client with proper ip address
+			
+				
+				
+				if (currentlyProcessedFrame.getType() == 0x00) { // beginning of file
+					c = new Client(ipTable.get(currentlyProcessedFrame.getIdO())); 
 				}
+				
 				c.sendFrame(currentlyProcessedFrame);
+				
+				if (currentlyProcessedFrame.getType() == 0x01) { // end of file
+					c.closeSession();
+				}
 				
 				// announce frame OK
 				out.write((byte) 0x05); 
