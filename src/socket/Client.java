@@ -33,7 +33,7 @@ public class Client {
 	}
 	
 	//closing session
-	private void closeSession() throws IOException {
+	public void closeSession() throws IOException {
 		this.socket.close();
 		log("session closed");
 	}
