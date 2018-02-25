@@ -28,6 +28,8 @@ public class Frame {
 	public final static byte CONFIRM = 0x05;
 	public final static byte ERROR = 0x04;
 	public final static byte FATAL_ERROR = 0x08;
+	public final static byte FIRST_FRAME = 0x10;
+	public final static byte LAST_FRAME = 0x01;
 	
 	//Frame constructor filling data with 1
 	public Frame() {

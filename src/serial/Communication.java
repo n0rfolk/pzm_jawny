@@ -41,7 +41,7 @@ public class Communication {
 	 */
 	public void deploy() {
 		(new Thread(new FpgaReader(in, out))).start();
-        //(new Thread(new Server(in, out))).start();
+        (new Thread(new Server(in, out))).start();
 	}
 	
 	/**
