@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-
 import utilities.Frame;
 import utilities.LogWriter;
 
-public class Server {
+public class Server implements Runnable {
 	//Server attributes
 	ServerSocket serverSocket;
 	Socket socket;
@@ -18,11 +16,17 @@ public class Server {
 
 	// default Server constructor
 	public Server() {
+		initServer();
+	}
+	
+	//Server restarts after Client closed session or entire file sent
+	private void initServer() {
 		try {
 			this.serverSocket = new ServerSocket(9999);
-			log("created new instance");
+			log("server initialization...");
+			log("waiting for client...");
 			this.socket = serverSocket.accept();
-			log("connection established");
+			log("client confirmed, connection established");
 			this.in = socket.getInputStream();	
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -30,10 +34,12 @@ public class Server {
 	}
 	
 	//Server start
-	void run(){
-		readFrame();
-		// TODO: FpgaWriter
-		//closeSession();	
+	public void run(){
+		while(true) {
+			readFrame();
+			// TODO: FpgaWriter
+			//closeSession();
+		}	
 	}
 	
 	//Read frame
@@ -49,6 +55,7 @@ public class Server {
 	}
 	
 	//closing server session
+	@SuppressWarnings("unused")
 	private void closeSession() throws IOException {
 		this.socket.close();
 		this.serverSocket.close();
@@ -57,12 +64,5 @@ public class Server {
 	//prints logs
 	private void log(String s) {
 		LogWriter.log(this.getClass().getName(), s);
-	}
-	
-	public static void main(String[] args) {
-		Server server = new Server();
-		while(true) {
-			server.run();
-		}
-	}
+	}	
 }
