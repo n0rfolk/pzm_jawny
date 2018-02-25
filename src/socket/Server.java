@@ -2,8 +2,11 @@ package socket;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import serial.FpgaWriter;
 import utilities.Frame;
 import utilities.LogWriter;
 
@@ -12,16 +15,30 @@ public class Server implements Runnable {
 	ServerSocket serverSocket;
 	Socket socket;
 	InputStream in;
-	// TODO: FpgaWriter
+	InputStream inComm;
+	OutputStream outComm;
+	Frame currentFrame;
+	FpgaWriter fpgaWriter;
+	private int serverRestarted;
+	private byte signal;
 
-	// default Server constructor
-	public Server() {
+	// default Server constructor, init Server and init FpgaWriter
+	public Server(InputStream inComm, OutputStream outComm) {
+		this.serverRestarted = 0;
+		this.signal = Frame.CONFIRM;
+		this.inComm = inComm;
+		this.outComm = outComm;
+		this.fpgaWriter = new FpgaWriter(inComm, outComm);
 		initServer();
 	}
 	
 	//Server restarts after Client closed session or entire file sent
 	private void initServer() {
 		try {
+			serverRestarted++;
+			if (serverRestarted > 0) {
+				log("server restarting");
+			}
 			this.serverSocket = new ServerSocket(9999);
 			log("server initialization...");
 			log("waiting for client...");
@@ -36,11 +53,28 @@ public class Server implements Runnable {
 	//Server start
 	public void run(){
 		while(true) {
-			readFrame();
-			// TODO: FpgaWriter
-			//closeSession();
-		}	
-	}
+			try {
+				//Reading frame after FPGA confirmed last frame
+				if (signal == Frame.CONFIRM) {
+					readFrame();
+				}
+				fpgaWriter.sendFrame(currentFrame);
+				//Waiting for CONFIRM signal from FPGA
+				while ((signal = (byte) inComm.read()) == 0xFF) {}
+				//Log confirmation from FPGA
+				if (signal == Frame.CONFIRM) {
+					log("frame " + currentFrame.getNr() + " confirmed from FPGA");
+				}
+				//close session after last frame and restart
+				if(currentFrame.getType() == 0x01 && signal == Frame.CONFIRM) {
+					closeSession();
+					initServer();
+				}
+			}catch (IOException e) {
+					
+			}
+		}
+	}	
 	
 	//Read frame
 	private void readFrame() {
@@ -48,6 +82,7 @@ public class Server implements Runnable {
 		try {
 			this.in.read(buffer);
 			Frame.printBytes(buffer);
+			this.currentFrame = new Frame(buffer);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -55,7 +90,6 @@ public class Server implements Runnable {
 	}
 	
 	//closing server session
-	@SuppressWarnings("unused")
 	private void closeSession() throws IOException {
 		this.socket.close();
 		this.serverSocket.close();
