@@ -59,17 +59,17 @@ public class FpgaReader implements Runnable  {
     	boolean startFrameOccured = false;
     	
     	try {
-			while ((currentByte = (byte) in.read()) != 0x07) {
+			while ((currentByte = (byte) in.read()) != Frame.STOP) {
 				//log("currentByte: " + String.format("0x%02X", currentByte));
 				if (startFrameOccured) {
 					buffer[i] = currentByte;
 					i++;
 				}
-				if (currentByte == 0x06) {
+				if (currentByte == Frame.START) {
 					startFrameOccured = true;
 				}
 			}
-			// in this place buffer has whole frame without START (0x06) and without END (0x07)
+			// in this place buffer has whole frame without START (0x06) and without STOP (0x07)
 			
 		
 			
@@ -80,24 +80,25 @@ public class FpgaReader implements Runnable  {
 			Frame.printBytes(currentlyProcessedFrame.getBytesWithCRC());
 			
 			// 3 - calculate crc
+			//log("calcCrc32: " + String.format("0x%02X", currentlyProcessedFrame.calcCrc32()));
 			if (currentlyProcessedFrame.getcrc32() == currentlyProcessedFrame.calcCrc32()) {
 				// 3.1
 				// CRC: OK
 			
 				
 				
-				if (currentlyProcessedFrame.getType() == 0x00) { // beginning of file
+				if (currentlyProcessedFrame.getType() == Frame.FIRST_FRAME) { // beginning of file
 					c = new Client(ipTable.get(currentlyProcessedFrame.getIdO())); 
 				}
 				
 				c.sendFrame(currentlyProcessedFrame);
 				
-				if (currentlyProcessedFrame.getType() == 0x01) { // end of file
+				if (currentlyProcessedFrame.getType() == Frame.LAST_FRAME) { // end of file
 					c.closeSession();
 				}
 				
 				// announce frame OK
-				out.write((byte) 0x05); 
+				out.write((byte) Frame.CONFIRM); 
 			} else {
 				// 3.2
 				// CRC: ERR
@@ -105,10 +106,10 @@ public class FpgaReader implements Runnable  {
 				retransmissionRequestCounter++;
 				if (retransmissionRequestCounter < 50) {
 					// announce error
-					out.write((byte) 0x04);
+					out.write((byte) Frame.ERROR);
 				} else {
 					// announce fatal error
-					out.write((byte) 0x08);
+					out.write((byte) Frame.FATAL_ERROR);
 					retransmissionRequestCounter = 0;
 				}
 			}
