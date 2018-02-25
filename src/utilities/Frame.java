@@ -25,6 +25,9 @@ public class Frame {
 	public final static byte STOP = 0x07;
 	public final static byte ESCAPE = 0x14;
 	public final static byte XORVALUE = 0x20;
+	public final static byte CONFIRM = 0x05;
+	public final static byte ERROR = 0x04;
+	public final static byte FATAL_ERROR = 0x08;
 	
 	//Frame constructor filling data with 1
 	public Frame() {
