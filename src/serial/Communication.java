@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
+import socket.Server;
 import utilities.LogWriter;
 
 public class Communication {
@@ -36,7 +37,7 @@ public class Communication {
                 this.out = serialPort.getOutputStream();
                 
                 (new Thread(new FpgaReader(in, out))).start();
-               // (new Thread(new SerialWriter(out))).start();
+                (new Thread(new Server())).start();
                 
                 log("Setting up succeeded!");
                 log("FpgaReader is running..");

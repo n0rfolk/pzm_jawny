@@ -3,7 +3,6 @@ package socket;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import utilities.Frame;
 import utilities.LogWriter;
 
@@ -33,16 +32,23 @@ public class Client {
 	}
 	
 	//closing session
-	private void closeSession() throws IOException {
-		this.socket.close();
-		log("session closed");
+	public void closeSession() {
+		try {
+			this.socket.close();
+			log("session closed");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//sending frame
-	public void sendFrame(Frame f) throws IOException {
-		this.out.write(f.getBytesWithCRC());
-		log("frame sent");
-		//closeSession();
+	public void sendFrame(Frame f){
+		try {
+			this.out.write(f.getBytesWithCRC());
+			log("frame sent");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//prints logs
