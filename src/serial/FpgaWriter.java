@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import utilities.Frame;
 import utilities.LogWriter;
 
-public class FpgaWriter implements Runnable 
-{
+public class FpgaWriter {
+	// serial comm streams
 	InputStream in;
     OutputStream out;
     
@@ -24,6 +25,15 @@ public class FpgaWriter implements Runnable
             }                
         }
         catch (IOException e) { e.printStackTrace(); }            
+    }
+    
+    public void sendFrame(Frame f) {
+    	try {
+			out.write(Frame.START);
+			out.write(Frame.escapeBytes(f.getBytesWithCRC()));
+			out.write(Frame.STOP);
+			out.flush();
+		} catch (IOException e) { e.printStackTrace(); }
     }
     
 	private void log(String s) {
