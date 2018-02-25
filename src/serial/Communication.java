@@ -13,8 +13,8 @@ import utilities.LogWriter;
 
 public class Communication {
 	// serial comm streams
-	private InputStream in; 
-    private OutputStream out; 
+	private InputStream fpgaReaderIn; 
+    private OutputStream fpgaReaderOut; 
 
 	public Communication(String portName) throws Exception {
 		
@@ -33,10 +33,10 @@ public class Communication {
                 serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE); 
                 log("Port opening: OK");
                 
-                this.in = serialPort.getInputStream();
-                this.out = serialPort.getOutputStream();
+                this.fpgaReaderIn = serialPort.getInputStream();
+                this.fpgaReaderOut = serialPort.getOutputStream();
                 
-                (new Thread(new FpgaReader(in, out))).start();
+                (new Thread(new FpgaReader(fpgaReaderIn, fpgaReaderOut))).start();
                 //(new Thread(new Server())).start();
                 
                 log("Setting up succeeded!");
@@ -51,11 +51,11 @@ public class Communication {
 	}
 	
 	public InputStream getInputStream() {
-		return in;
+		return fpgaReaderIn;
 	}
 
 	public OutputStream getOutputStream() {
-		return out;
+		return fpgaReaderOut;
 	}
 	
 	private void log(String s) {
