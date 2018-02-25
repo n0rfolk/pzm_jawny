@@ -21,10 +21,10 @@ public class Frame {
 	int crc32;
 	
 	//trash
-	private final static byte START = 0x06;
-	private final static byte STOP = 0x07;
-	private final static byte ESCAPE = 0x14;
-	private final static byte XORVALUE = 0x20;
+	public final static byte START = 0x06;
+	public final static byte STOP = 0x07;
+	public final static byte ESCAPE = 0x14;
+	public final static byte XORVALUE = 0x20;
 	
 	//Frame constructor filling data with 1
 	public Frame() {

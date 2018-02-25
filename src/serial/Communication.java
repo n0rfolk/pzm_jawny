@@ -36,7 +36,7 @@ public class Communication {
                 this.in = serialPort.getInputStream();
                 this.out = serialPort.getOutputStream();
                 
-                (new Thread(new FpgaReader(in, out))).start();
+                //(new Thread(new FpgaReader(in, out))).start();
                 (new Thread(new Server())).start();
                 
                 log("Setting up succeeded!");

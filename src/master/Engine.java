@@ -2,6 +2,7 @@ package master;
 
 import serial.FpgaReader;
 import serial.FpgaWriter;
+import socket.Server;
 import serial.Communication;
 import utilities.Frame;
 import utilities.LogWriter;
@@ -29,7 +30,8 @@ public class Engine {
 		
 		// initialize serial communication
 		try {
-			this.sc = new Communication("COM6");
+			(new Thread(new Server())).start();
+			//this.sc = new Communication("COM7");
 		} catch (Exception e) { e.printStackTrace(); }
 	}
 	

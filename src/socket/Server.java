@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import serial.FpgaWriter;
 import utilities.Frame;
 import utilities.LogWriter;
 
@@ -12,7 +14,8 @@ public class Server implements Runnable {
 	ServerSocket serverSocket;
 	Socket socket;
 	InputStream in;
-	// TODO: FpgaWriter
+	Frame currentFrame;
+	FpgaWriter fpgaWriter;
 
 	// default Server constructor
 	public Server() {
@@ -48,6 +51,7 @@ public class Server implements Runnable {
 		try {
 			this.in.read(buffer);
 			Frame.printBytes(buffer);
+			this.currentFrame = new Frame(buffer);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
