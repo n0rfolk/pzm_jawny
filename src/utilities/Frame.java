@@ -20,7 +20,7 @@ public class Frame {
 	byte[] data;
 	int crc32;
 	
-	//trash
+	//flags
 	public final static byte START = 0x06;
 	public final static byte STOP = 0x07;
 	public final static byte ESCAPE = 0x14;
