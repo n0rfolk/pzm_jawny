@@ -93,7 +93,7 @@ public class Communication {
 				this.in = port.getInputStream();
 				this.out = port.getOutputStream();
 			} catch (IOException e) { e.printStackTrace(); }
-            log("Assigning comm streams succeded!");
+            log("Assigning comm streams: OK");
 
 		} else {
 			log("There are no serial ports available. Terminating..");

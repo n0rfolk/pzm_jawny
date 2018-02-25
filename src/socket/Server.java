@@ -14,17 +14,17 @@ public class Server implements Runnable {
 	//Server attributes
 	ServerSocket serverSocket;
 	Socket socket;
-	InputStream in;
+	InputStream inSocket;
 	InputStream inComm;
 	OutputStream outComm;
 	Frame currentFrame;
 	FpgaWriter fpgaWriter;
-	private int serverRestarted;
+	private boolean serverRestarted;
 	private byte signal;
 
 	// default Server constructor, init Server and init FpgaWriter
 	public Server(InputStream inComm, OutputStream outComm) {
-		this.serverRestarted = 0;
+		this.serverRestarted = false;
 		this.signal = Frame.CONFIRM;
 		this.inComm = inComm;
 		this.outComm = outComm;
@@ -35,16 +35,16 @@ public class Server implements Runnable {
 	//Server restarts after Client closed session or entire file sent
 	private void initServer() {
 		try {
-			serverRestarted++;
-			if (serverRestarted > 0) {
+			if (serverRestarted) {
 				log("server restarting");
 			}
+			serverRestarted = true;
 			this.serverSocket = new ServerSocket(9999);
 			log("server initialization...");
 			log("waiting for client...");
 			this.socket = serverSocket.accept();
 			log("client confirmed, connection established");
-			this.in = socket.getInputStream();	
+			this.inSocket = socket.getInputStream();	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,9 +70,7 @@ public class Server implements Runnable {
 					closeSession();
 					initServer();
 				}
-			}catch (IOException e) {
-					
-			}
+			} catch (IOException e) { e.printStackTrace(); }
 		}
 	}	
 	
@@ -80,12 +78,10 @@ public class Server implements Runnable {
 	private void readFrame() {
 		byte[] buffer = new byte[Frame.SIZE];
 		try {
-			this.in.read(buffer);
+			this.inSocket.read(buffer);
 			Frame.printBytes(buffer);
 			this.currentFrame = new Frame(buffer);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} catch (IOException e) { e.printStackTrace(); }
 		log("frame read");
 	}
 	
