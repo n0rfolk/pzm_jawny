@@ -16,7 +16,7 @@ import utilities.LogWriter;
  */
 public class FpgaReader implements Runnable  {
 	
-    private Frame currentlyProcessedFrame; // temporary frame variable
+    private Frame currentFrame; // temporary frame variable
     private int retransmissionRequestCounter;
 	
 	// serial comm streams
@@ -33,7 +33,7 @@ public class FpgaReader implements Runnable  {
         this.in = in;
         this.out = out;
         this.retransmissionRequestCounter = 0;
-        this.currentlyProcessedFrame = null;
+        this.currentFrame = null;
         this.ipTable = FileLoader.getIpTable(); // load ipTables from file
         log(".. is listening");
     }
@@ -52,9 +52,10 @@ public class FpgaReader implements Runnable  {
      */
     public void processFrame() {
     	// 1 - receive whole frame from fpga device 
-    	byte[] buffer = new byte[Frame.SIZE * 2];
+    	//byte[] buffer = new byte[Frame.SIZE * 2];
+    	ArrayList<Byte> buffer = new ArrayList<Byte>();
     	
-    	int i = 0;
+    	//int i = 0;
     	byte currentByte;
     	boolean startFrameOccured = false;
     	
@@ -62,8 +63,9 @@ public class FpgaReader implements Runnable  {
 			while ((currentByte = (byte) in.read()) != Frame.STOP) {
 				//log("currentByte: " + String.format("0x%02X", currentByte));
 				if (startFrameOccured) {
-					buffer[i] = currentByte;
-					i++;
+					buffer.add(currentByte);
+					//buffer[i] = currentByte;
+					//i++;
 				}
 				if (currentByte == Frame.START) {
 					startFrameOccured = true;
@@ -71,29 +73,33 @@ public class FpgaReader implements Runnable  {
 			}
 			// in this place buffer has whole frame without START (0x06) and without STOP (0x07)
 			
-		
+			//convert ArrayList<Byte> to byte[]
+			byte[] bufferBytes = new byte[buffer.size()];
+			for (int i = 0; i < buffer.size(); i++) {
+				bufferBytes[i] = buffer.get(i);
+			}
 			
 			// 2 - create new Frame object 
-			currentlyProcessedFrame = new Frame(Frame.deescapeBytes(buffer));
+			currentFrame = new Frame(Frame.deescapeBytes(bufferBytes));
 			
 			log("Frame with CRC");
-			Frame.printBytes(currentlyProcessedFrame.getBytesWithCRC());
+			Frame.printBytes(currentFrame.getBytesWithCRC());
 			
 			// 3 - calculate crc
 			//log("calcCrc32: " + String.format("0x%02X", currentlyProcessedFrame.calcCrc32()));
-			if (currentlyProcessedFrame.getcrc32() == currentlyProcessedFrame.calcCrc32()) {
+			if (currentFrame.getcrc32() == currentFrame.calcCrc32()) {
 				// 3.1
 				// CRC: OK
 			
 				
 				
-				if (currentlyProcessedFrame.getType() == Frame.FIRST_FRAME) { // beginning of file
-					c = new Client(ipTable.get(currentlyProcessedFrame.getIdO())); 
+				if (currentFrame.getType() == Frame.FIRST_FRAME) { // beginning of file
+					c = new Client(ipTable.get(currentFrame.getIdO())); 
 				}
 				
-				c.sendFrame(currentlyProcessedFrame);
+				c.sendFrame(currentFrame);
 				
-				if (currentlyProcessedFrame.getType() == Frame.LAST_FRAME) { // end of file
+				if (currentFrame.getType() == Frame.LAST_FRAME) { // end of file
 					c.closeSession();
 				}
 				
@@ -118,7 +124,7 @@ public class FpgaReader implements Runnable  {
     	
     	// clean up temporary variables
     	retransmissionRequestCounter = 0;
-    	currentlyProcessedFrame = null;
+    	currentFrame = null;
     }
 
     
