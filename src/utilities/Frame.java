@@ -11,12 +11,14 @@ import java.util.zip.Checksum;
 
 public class Frame {
 	//Frame structure
-	public static final int SIZE = 75;
+	public static final int SIZE = 87; // in bytes
 	public static final int dataSize = 64;
+	public static final int nonceSize = 12;
 	byte type;
 	byte idO;
 	byte idN;
 	int nr;
+	byte[] nonce;
 	byte[] data;
 	int crc32;
 	
@@ -34,18 +36,10 @@ public class Frame {
 	
 	//Frame constructor filling data with 1
 	public Frame() {
+		this.nonce = new byte[nonceSize];
+		Arrays.fill(this.nonce, (byte) 1);
 		this.data = new byte[dataSize];
 		Arrays.fill(this.data, (byte) 1);
-	}
-	
-	//Frame default constructor
-	public Frame(byte type, byte idO, byte idN, int nr, byte[] ip, byte[] data, int crc32) {
-		this.type = type;
-		this.idO = idO;
-		this.idN = idN;
-		this.nr = nr;
-		this.data = data;
-		this.crc32 = crc32;
 	}
 	
 	//Frame unpacking from byte[]
@@ -54,12 +48,23 @@ public class Frame {
 		this.idO = bytes[1];
 		this.idN = bytes[2];
 		this.nr = bytesToInt(new byte[] {bytes[3], bytes[4], bytes[5], bytes[6]});
+		
+		//filling nonce
+		byte[] nonceBytes = new byte[nonceSize];
+		Arrays.fill(nonceBytes, (byte) 0);
+		for (int i = 0; i < nonceSize; i++) {
+			nonceBytes[i] = bytes[7 + i];
+		}
+		this.nonce = nonceBytes;
+		
+		//filling data
 		byte[] dataBytes = new byte[dataSize];
 		Arrays.fill(dataBytes, (byte) 0);
 		for (int i = 0; i < dataSize; i++) {
-			dataBytes[i] = bytes[7 + i];
+			dataBytes[i] = bytes[nonceSize + 7 + i];
 		}
 		this.data = dataBytes;
+		
 		this.crc32 = bytesToInt(new byte[] {bytes[SIZE-4], bytes[SIZE-3], bytes[SIZE-2], bytes[SIZE-1]});			
 	}
 	
@@ -71,10 +76,10 @@ public class Frame {
 		IdOTab[0] = this.getIdO();
 		byte[] IdNTab = new byte[1];
 		IdNTab[0] = this.getIdN();
-		byte[] bytes = bytesConcatenation(typeTab, IdOTab, IdNTab, this.intToBytes(this.getNr()), this.getData());
+		byte[] bytes = bytesConcatenation(typeTab, IdOTab, IdNTab, this.intToBytes(this.getNr()), this.getNonce(), this.getData());
 		return bytes;
 	}
-	
+
 	//Returns calculated crc of a Frame
 	public int calcCrc32() {
 		Checksum checksum = new CRC32();
@@ -84,14 +89,15 @@ public class Frame {
 	}
 	
 	//returns concatenated bytes from Frame. Frame constructing without crc, used in getBytes()
-	public byte[] bytesConcatenation(byte[] type, byte[] idO, byte[] idN, byte[] nr, byte[] data) {
+	public byte[] bytesConcatenation(byte[] type, byte[] idO, byte[] idN, byte[] nr, byte[] nonce, byte[] data) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
 		try {
-			outputStream.write( type );
-			outputStream.write( idO );
-			outputStream.write( idN );
-			outputStream.write( nr );		
-			outputStream.write( data );
+			outputStream.write(type);
+			outputStream.write(idO);
+			outputStream.write(idN);
+			outputStream.write(nr);
+			outputStream.write(nonce);
+			outputStream.write(data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -188,52 +194,33 @@ public class Frame {
 	     return ByteBuffer.wrap(bytes).getInt();
 	}
 	
-	//getters and setters section
+	//getters section
 	public byte getType() {
 		return type;
 	}
-
-	public void setType(byte type) {
-		this.type = type;
+	
+	private byte[] getNonce() {
+		return nonce;
 	}
-
+	
 	public byte[] getData() {
 		return data;
-	}
-
-	public void setData(byte[] data) {
-		this.data = data;
 	}
 
 	public int getcrc32() {
 		return crc32;
 	}
 
-	public void setcrc32(int crc32) {
-		this.crc32 = crc32;
-	}
-
 	public byte getIdO() {
 		return idO;
 	}
 
-	public void setIdO(byte idO) {
-		this.idO = idO;
-	}
 
 	public byte getIdN() {
 		return idN;
 	}
 
-	public void setIdN(byte idN) {
-		this.idN = idN;
-	}
-
 	public int getNr() {
 		return nr;
-	}
-
-	public void setNr(int nr) {
-		this.nr = nr;
 	}	
 }
