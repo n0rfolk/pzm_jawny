@@ -60,11 +60,17 @@ public class Server implements Runnable {
 				}
 				fpgaWriter.sendFrame(currentFrame);
 				//Waiting for CONFIRM signal from FPGA
-				while ((signal = (byte) inComm.read()) == 0xFF) {}
+				do{
+					signal = (byte) inComm.read();
+					if(signal != (byte) 0xFF) {
+						log("signal bez ff: " + String.format("0x%02X", signal));
+					}
+				}while(signal == (byte)0xFF);
 				//Log confirmation from FPGA
 				if (signal == Frame.CONFIRM) {
 					log("frame " + currentFrame.getNr() + " confirmed from FPGA");
 				}
+				log("signal: " + String.format("0x%02X", signal));
 				//close session after last frame and restart
 				if(currentFrame.getType() == 0x01 && signal == Frame.CONFIRM) {
 					closeSession();
