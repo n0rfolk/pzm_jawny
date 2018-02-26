@@ -20,7 +20,6 @@ public class FileLoader {
 			String textLine = bufferedReader.readLine();
 			do {
 			  ipTable.add(textLine);
-			  //System.out.println(textLine);
 			  textLine = bufferedReader.readLine();
 			} while(textLine != null);
 			bufferedReader.close();

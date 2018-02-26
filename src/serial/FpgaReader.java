@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Map.Entry;
-
 import socket.Client;
 import utilities.FileLoader;
 import utilities.Frame;
 import utilities.LogWriter;
 
 /**
- * This class handles frames comming from fpga
+ * This class handles frames coming from fpga
  */
 public class FpgaReader implements Runnable  {
 	
@@ -23,7 +21,7 @@ public class FpgaReader implements Runnable  {
     InputStream in;
     OutputStream out;
     
-    // socket comm minsc
+    // socket comm misc
     Client c;
     ArrayList<String> ipTable; // maps ids to ip adresses
     
@@ -90,25 +88,21 @@ public class FpgaReader implements Runnable  {
 			if (currentFrame.getcrc32() == currentFrame.calcCrc32()) {
 				// 3.1
 				// CRC: OK
-			
 				
-				
-				if (currentFrame.getType() == Frame.FIRST_FRAME) { // beginning of file
+				if (currentFrame.getType() == Frame.FIRST_FRAME || currentFrame.getType() == Frame.SINGLE_FRAME) { 
 					c = new Client(ipTable.get(currentFrame.getIdO())); 
 				}
 				
 				c.sendFrame(currentFrame);
 				
-				if (currentFrame.getType() == Frame.LAST_FRAME) { // end of file
+				if (currentFrame.getType() == Frame.LAST_FRAME || currentFrame.getType() == Frame.SINGLE_FRAME) {
 					c.closeSession();
 				}
 				
-				// announce frame OK
 				out.write((byte) Frame.CONFIRM); 
 			} else {
 				// 3.2
 				// CRC: ERR
-				// retransmission needed
 				retransmissionRequestCounter++;
 				if (retransmissionRequestCounter < 50) {
 					// announce error
