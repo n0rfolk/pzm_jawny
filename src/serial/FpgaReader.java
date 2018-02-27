@@ -85,7 +85,7 @@ public class FpgaReader implements Runnable  {
 			
 			// 3 - calculate crc
 			//log("calcCrc32: " + String.format("0x%02X", currentlyProcessedFrame.calcCrc32()));
-			if (currentFrame.getcrc32() == currentFrame.calcCrc32()) {
+			if (currentFrame.getcrc32() != currentFrame.calcCrc32()) {
 				// 3.1
 				// CRC: OK
 				
@@ -100,6 +100,7 @@ public class FpgaReader implements Runnable  {
 				}
 				
 				out.write((byte) Frame.CONFIRM); 
+				log("Confirmation sent to FPGA");
 			} else {
 				// 3.2
 				// CRC: ERR

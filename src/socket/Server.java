@@ -55,27 +55,28 @@ public class Server implements Runnable {
 		while(true) {
 			try {
 				//Reading frame after FPGA confirmed last frame
-				if (signal == Frame.CONFIRM) {
+				if (signal == (byte) Frame.CONFIRM) {
 					readFrame();
 				}
 				fpgaWriter.sendFrame(currentFrame);
 				//Waiting for CONFIRM signal from FPGA
 				do {
 					signal = (byte) inComm.read();
-				} while(signal == (byte)0xFF);
+					log("signal: " + String.format("0x%02X", signal));
+				} while(signal == (byte) 0xFF);
 				//Log confirmation from FPGA
-				if (signal == Frame.CONFIRM) {
+				if (signal == (byte) Frame.CONFIRM) {
 					log("frame " + currentFrame.getNr() + " confirmed from FPGA");
 				}
 				log("signal: " + String.format("0x%02X", signal));
 				//close session after last or single frame and restart
-				if((currentFrame.getType() == Frame.LAST_FRAME || currentFrame.getType() == Frame.SINGLE_FRAME) && signal == Frame.CONFIRM) {
+				if((currentFrame.getType() == (byte) Frame.LAST_FRAME || currentFrame.getType() == (byte) Frame.SINGLE_FRAME) && signal == (byte) Frame.CONFIRM) {
 					closeSession();
 					initServer();
 				}
 			} catch (IOException e) { e.printStackTrace(); }
 		}
-	}	
+	}	 
 	
 	//Read frame
 	private void readFrame() {
