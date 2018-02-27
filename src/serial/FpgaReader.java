@@ -89,13 +89,13 @@ public class FpgaReader implements Runnable  {
 				// 3.1
 				// CRC: OK
 				
-				if (currentFrame.getType() == Frame.FIRST_FRAME || currentFrame.getType() == Frame.SINGLE_FRAME) { 
+				if (currentFrame.getType() == (byte) Frame.FIRST_FRAME || currentFrame.getType() == (byte) Frame.SINGLE_FRAME) { 
 					c = new Client(ipTable.get(currentFrame.getIdO())); 
 				}
 				
 				c.sendFrame(currentFrame);
 				
-				if (currentFrame.getType() == Frame.LAST_FRAME || currentFrame.getType() == Frame.SINGLE_FRAME) {
+				if (currentFrame.getType() == (byte) Frame.LAST_FRAME || currentFrame.getType() == (byte) Frame.SINGLE_FRAME) {
 					c.closeSession();
 				}
 				
